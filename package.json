@@ -1,0 +1,28 @@
+{
+  "author": "jdb",
+  "bugs": {
+    "url": "https://github.com/jdbaldry/darts/issues"
+  },
+  "description": "A dart board canvas and utilities for tracking scores.",
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "typescript": "^5.7.3"
+  },
+  "homepage": "https://github.com/jdbaldry/darts#readme",
+  "keywords": [
+    "darts"
+  ],
+  "license": "GPL-3.0-or-later",
+  "main": "index.js",
+  "name": "darts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdbaldry/darts.git"
+  },
+  "scripts": {
+    "start": "node index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "version": "1.0.0"
+}
