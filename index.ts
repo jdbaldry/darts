@@ -1,5 +1,8 @@
 import http from "node:http";
 
+const canvasWidth = 400;
+const canvasHeight = 400;
+
 const server = http.createServer((request, response) => {
   response.writeHead(200, { "Content-Type": "text/html" });
   response.write(`
@@ -16,7 +19,7 @@ const server = http.createServer((request, response) => {
         </style>
     </head>
     <body>
-        <canvas id="dartBoard" width="400" height="400"></canvas>
+        <canvas id="dartBoard" width="" height="400"></canvas>
         <script>
             const canvas = document.getElementById('dartBoard');
             const ctx = canvas.getContext('2d');
