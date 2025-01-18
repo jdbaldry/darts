@@ -24,11 +24,15 @@ const server = http.createServer((request, response) => {
             function drawDartBoard() {
                 const centerX = canvas.width / 2;
                 const centerY = canvas.height / 2;
-                const radius = 150;
+                const outerRadius = 150;
+                const innerBullRadius = 30;
+                const outerBullRadius = 50;
+                const tripleRingRadius = 100;
+                const doubleRingRadius = 120;
 
                 // Draw the outer circle
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
                 ctx.fillStyle = '#FFCC00';
                 ctx.fill();
                 ctx.stroke();
@@ -37,8 +41,6 @@ const server = http.createServer((request, response) => {
                 const segments = 20;
                 for (let i = 0; i < segments; i++) {
                     const angle = (i * Math.PI * 2) / segments;
-                    const innerRadius = radius * 0.5;
-                    const outerRadius = radius;
 
                     ctx.beginPath();
                     ctx.moveTo(centerX, centerY);
@@ -51,9 +53,29 @@ const server = http.createServer((request, response) => {
 
                 // Draw the bullseye
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, radius * 0.1, 0, Math.PI * 2);
+                ctx.arc(centerX, centerY, innerBullRadius, 0, Math.PI * 2);
                 ctx.fillStyle = '#000000';
                 ctx.fill();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, outerBullRadius, 0, Math.PI * 2);
+                ctx.fillStyle = '#FF0000';
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw the triple ring
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, tripleRingRadius, 0, Math.PI * 2);
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = '#0000FF';
+                ctx.stroke();
+
+                // Draw the double ring
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, doubleRingRadius, 0, Math.PI * 2);
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = '#0000FF';
                 ctx.stroke();
             }
 
