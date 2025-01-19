@@ -1,62 +1,225 @@
-const canvas = document.getElementById('dartBoard') as HTMLCanvasElement;
-const ctx = canvas.getContext('2d');
+type Point = {
+  x: number;
+  y: number;
+};
 
-function drawDartBoard() {
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const outerRadius = 150;
-    const innerBullRadius = 30;
-    const outerBullRadius = 50;
-    const tripleRingRadius = 100;
-    const doubleRingRadius = 120;
+/*
+https://www.reddragondarts.com/pages/darts-rules
 
-    // Draw the outer circle
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
-    ctx.fillStyle = '#FFCC00';
-    ctx.fill();
-    ctx.stroke();
+Double and Treble dimensions to be;
 
-    // Draw the inner circles
-    const segments = 20;
-    for (let i = 0; i < segments; i++) {
-        const angle = (i * Math.PI * 2) / segments;
+– for conventional wire boards, measured inside to inside           = 8.0mm +/- 0.2mm
+– for boards manufactured with strip material measured apex to apex = 9.6mm +/- 0.2mm
 
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, outerRadius, angle, angle + (Math.PI * 2) / segments);
-        ctx.lineTo(centerX, centerY);
-        ctx.fillStyle = i % 2 === 0 ? '#FF0000' : '#00FF00';
-        ctx.fill();
-        ctx.stroke();
+‘Bull’ inside diameter                        = 12.7 mm.  +/- 0.2 mm
+’25’ ring inside diameter                     = 31.8mm    +/- 0.3 mm
+Outside edge of ‘Double’ wire to Centre Bull  = 170.0 mm. +/- 0.2 mm
+Outside edge of ‘Treble’ wire to Centre Bull  = 107.0 mm. +/- 0.2 mm
+Outside edge of ‘Double’ wire to outside edge = 340.0 mm. +/- 0.5 mm
+Of ‘Double’ wire
+Overall dartboard diameter {+/- 3.0 mm.}      = 451.0 mm. +/- 3.0 mm
+*/
+const INNER_BULL_INSIDE_DIAMETER = 12.7;
+const OUTER_BULL_INSIDE_DIAMETER = 31.8;
+const DOUBLE_WIRE_TO_CENTER_BULL = 170;
+const TREBLE_WIRE_TO_CENTER_BULL = 107;
+const DOUBLE_WIRE_TO_OUTSIDE_EDGE = 340;
+const OVERALL_DART_BOARD_DIAMETER = 451;
+const DOUBLE_TREBLE_WIDTH = 8;
+const WIRE_WIDTH = 1;
+
+const SEGMENTS = 20;
+const SEGMENT_MAPPINGS = [
+  20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5,
+];
+const WIRE_COLOR = "grey";
+const INNER_BULL_COLOR = "red";
+const OUTER_BULL_COLOR = "green";
+const SEGMENT_A_COLOR = "#2e343a";
+const SEGMENT_B_COLOR = "#fde1d0";
+
+class DartBoard {
+  private ctx: CanvasRenderingContext2D;
+  private center: Point;
+
+  debug: boolean = false;
+
+  constructor(canvas: HTMLCanvasElement, size: number) {
+    this.ctx = canvas.getContext("2d");
+
+    this.ctx.canvas.width = size;
+    this.ctx.canvas.height = size;
+    this.center = { x: canvas.width / 2, y: canvas.height / 2 };
+
+    addEventListener("click", (event) => {
+      const point: Point = this.getMousePos(this.ctx, event);
+
+      console.log(this.score(point), point);
+      this.drawDart(point);
+    });
+  }
+
+  private getMousePos(ctx: CanvasRenderingContext2D, evt: MouseEvent): Point {
+    return {
+      x: evt.clientX - ctx.canvas.offsetLeft,
+      y: evt.clientY - ctx.canvas.offsetTop,
+    };
+  }
+
+  private drawDart(point: Point) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(point.x, point.y);
+    this.ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
+    this.ctx.fillStyle = "orange";
+    this.ctx.fill();
+
+    // Draw lines extending from the center of the point to the edge of the canvas for debugging.
+    if (this.debug) {
+      this.ctx.moveTo(point.x, point.y);
+      this.ctx.lineTo(this.center.x, this.center.y);
+      this.ctx.stroke();
+    }
+  }
+
+  private drawSegments(length: number, fillStyle: (i: number) => string) {
+    for (let i = 0; i < SEGMENTS; i++) {
+      // Offset the start angle by half the angle of a segment.
+      const angle =
+        (Math.PI * 2) / SEGMENTS / 2 + ((Math.PI * 2) / SEGMENTS) * i;
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(this.center.x, this.center.y);
+      this.ctx.arc(
+        this.center.x,
+        this.center.y,
+        length,
+        angle,
+        angle + (Math.PI * 2) / SEGMENTS,
+      );
+      this.ctx.lineTo(this.center.x, this.center.y);
+      this.ctx.fillStyle = fillStyle(i);
+      this.ctx.lineWidth = WIRE_WIDTH;
+      this.ctx.strokeStyle = WIRE_COLOR;
+      this.ctx.fill();
+      this.ctx.stroke();
+    }
+  }
+  private drawCircle(center: Point, radius: number, fillStyle: string) {
+    this.ctx.beginPath();
+    this.ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+    this.ctx.fillStyle = fillStyle;
+    this.ctx.lineWidth = WIRE_WIDTH;
+    this.ctx.strokeStyle = WIRE_COLOR;
+    this.ctx.fill();
+    this.ctx.stroke();
+  }
+
+  // Draw the dartboard from the outside in.
+  draw() {
+    // Outer edge.
+    this.drawCircle(
+      this.center,
+      OVERALL_DART_BOARD_DIAMETER / 2,
+      SEGMENT_A_COLOR,
+    );
+    // Numbers.
+    for (let i = 0; i < SEGMENTS; i++) {
+      const angle = ((Math.PI * 2) / SEGMENTS) * i;
+      const text = SEGMENT_MAPPINGS[(i + 5) % SEGMENTS].toString();
+
+      this.ctx.font = "20px Arial";
+      this.ctx.fillStyle = "white";
+      this.ctx.textAlign = "center";
+      this.ctx.textBaseline = "middle";
+      this.ctx.fillText(
+        text,
+        this.center.x +
+          Math.cos(angle) * (OVERALL_DART_BOARD_DIAMETER / 2 - 20),
+        this.center.y +
+          Math.sin(angle) * (OVERALL_DART_BOARD_DIAMETER / 2 - 20),
+      );
     }
 
-    // Draw the bullseye
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, innerBullRadius, 0, Math.PI * 2);
-    ctx.fillStyle = '#000000';
-    ctx.fill();
-    ctx.stroke();
+    // Doubles.
+    this.drawSegments(DOUBLE_WIRE_TO_CENTER_BULL, (i) =>
+      i % 2 === 0 ? INNER_BULL_COLOR : OUTER_BULL_COLOR,
+    );
+    // Outer singles.
+    this.drawSegments(DOUBLE_WIRE_TO_CENTER_BULL - DOUBLE_TREBLE_WIDTH, (i) =>
+      i % 2 === 0 ? SEGMENT_A_COLOR : SEGMENT_B_COLOR,
+    );
+    // Trebles.
+    this.drawSegments(TREBLE_WIRE_TO_CENTER_BULL, (i) =>
+      i % 2 === 0 ? INNER_BULL_COLOR : OUTER_BULL_COLOR,
+    );
+    // Inner singles.
+    this.drawSegments(TREBLE_WIRE_TO_CENTER_BULL - DOUBLE_TREBLE_WIDTH, (i) =>
+      i % 2 === 0 ? SEGMENT_A_COLOR : SEGMENT_B_COLOR,
+    );
+    // Outer bull.
+    this.drawCircle(
+      this.center,
+      OUTER_BULL_INSIDE_DIAMETER / 2,
+      OUTER_BULL_COLOR,
+    );
+    // Inner bull.
+    this.drawCircle(
+      this.center,
+      INNER_BULL_INSIDE_DIAMETER / 2,
+      INNER_BULL_COLOR,
+    );
 
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, outerBullRadius, 0, Math.PI * 2);
-    ctx.fillStyle = '#FF0000';
-    ctx.fill();
-    ctx.stroke();
+    if (this.debug) this.drawGridLines();
+  }
 
-    // Draw the triple ring
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, tripleRingRadius, 0, Math.PI * 2);
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = '#0000FF';
-    ctx.stroke();
+  // Calculate the score of a dart throw.
+  score(point: Point) {
+    const distance = Math.sqrt(
+      Math.pow(point.x - this.center.x, 2) +
+        Math.pow(point.y - this.center.y, 2),
+    );
 
-    // Draw the double ring
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, doubleRingRadius, 0, Math.PI * 2);
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = '#0000FF';
-    ctx.stroke();
+    if (distance <= INNER_BULL_INSIDE_DIAMETER / 2) {
+      return "b50";
+    }
+
+    if (distance <= OUTER_BULL_INSIDE_DIAMETER / 2) {
+      return "b25";
+    }
+
+    const angle = Math.atan2(point.y - this.center.y, point.x - this.center.x);
+    const segment = Math.floor(((angle + Math.PI) / (Math.PI * 2)) * SEGMENTS);
+
+    const segmentScore = SEGMENT_MAPPINGS[(segment + 5) % SEGMENTS].toString();
+    const multiplier =
+      distance <= TREBLE_WIRE_TO_CENTER_BULL &&
+      distance > TREBLE_WIRE_TO_CENTER_BULL - DOUBLE_TREBLE_WIDTH
+        ? "t"
+        : distance <= DOUBLE_WIRE_TO_CENTER_BULL &&
+            distance > DOUBLE_WIRE_TO_CENTER_BULL - DOUBLE_TREBLE_WIDTH
+          ? "d"
+          : "";
+
+    return `${multiplier}${segmentScore}`;
+  }
+
+  // Draw a grid of count rows and columns across the canvas from the center.
+  private drawGridLines(count: number = 10) {
+    for (let i = 0; i < count; i++) {
+      const x = (this.ctx.canvas.width / count) * i;
+      const y = (this.ctx.canvas.height / count) * i;
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, 0);
+      this.ctx.lineTo(x, this.ctx.canvas.height);
+      this.ctx.moveTo(0, y);
+      this.ctx.lineTo(this.ctx.canvas.width, y);
+      this.ctx.strokeStyle = "grey";
+      this.ctx.stroke();
+    }
+  }
 }
 
-drawDartBoard();
+const canvas = document.getElementById("dartBoard") as HTMLCanvasElement;
+const board = new DartBoard(canvas, window.innerHeight);
+board.draw();

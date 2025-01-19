@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dart Board</title>
-    <style>
-        canvas {
-            border: 1px solid black;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Darts</title>
+  <style>
+      * {
+          padding: 0;
+          margin: 0;
+      }
+      canvas {
+          background: #eee;
+          display: block;
+          margin: 0 auto;
+      }
+  </style>
 </head>
 <body>
-    <canvas id="dartBoard" width="400" height="400"></canvas>
-    <script src="dartBoard.js"></script>
+  <canvas id="dartBoard"></canvas>
+  <script src="./dartBoard.js"></script>
 </body>
 </html>

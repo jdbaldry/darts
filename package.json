@@ -13,14 +13,15 @@
     "darts"
   ],
   "license": "GPL-3.0-or-later",
-  "main": "index.js",
+  "main": "dartBoard.js",
   "name": "darts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jdbaldry/darts.git"
   },
   "scripts": {
-    "start": "node index.ts",
+    "build": "npx tsc dartBoard.ts",
+    "dev": "npx tsc -w dartBoard.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "type": "module",
