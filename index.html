@@ -9,14 +9,32 @@
           padding: 0;
           margin: 0;
       }
+      body {
+          display: flex;
+      }
+      #menu {
+          width: 200px;
+          background: #f0f0f0;
+          padding: 10px;
+      }
       canvas {
           background: #eee;
           display: block;
           margin: 0 auto;
       }
+      button {
+          margin: 5px 0;
+          padding: 10px;
+          width: 100%;
+      }
   </style>
 </head>
 <body>
+  <div id="menu">
+      <button id="resetButton">Reset</button>
+      <button id="startButton">Start Game</button>
+      <button id="stopButton">Stop Game</button>
+  </div>
   <canvas id="dartboard"></canvas>
   <script src="./dartboard.js"></script>
 </body>
