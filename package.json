@@ -6,24 +6,30 @@
   "description": "A dart board canvas and utilities for tracking scores.",
   "devDependencies": {
     "@types/node": "^22.10.7",
-    "typescript": "^5.7.3"
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.7.3",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
   },
   "homepage": "https://github.com/jdbaldry/darts#readme",
   "keywords": [
     "darts"
   ],
   "license": "GPL-3.0-or-later",
-  "main": "dartBoard.js",
+  "main": "private",
   "name": "darts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jdbaldry/darts.git"
   },
   "scripts": {
-    "build": "npx tsc dartboard.ts",
-    "dev": "npx tsc -w dartboard.ts",
+    "build": "webpack",
+    "dev": "webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "type": "module",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "dependencies": {
+    "@types/wicg-file-system-access": "^2023.10.5"
+  }
 }
