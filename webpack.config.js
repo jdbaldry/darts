@@ -2,6 +2,7 @@ import path from "path";
 
 export default {
   entry: "./src/app.ts",
+  devtool: "inline-source-map",
   module: {
     rules: [
       {

@@ -38,7 +38,7 @@ const SEGMENT_B_COLOR = "#fde1d0";
 export class Dartboard {
   private center: Point;
   private ctx: CanvasRenderingContext2D;
-  private out: Boolean = false;
+  private scale: number;
 
   debug: boolean = false;
 
@@ -52,23 +52,26 @@ export class Dartboard {
     this.ctx.canvas.width = size;
     this.ctx.canvas.height = size;
     this.center = { x: canvas.width / 2, y: canvas.height / 2 };
+    this.scale = size / OVERALL_DART_BOARD_DIAMETER;
 
     this.draw();
   }
 
   reset() {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.draw();
   }
 
   resize(size: number) {
     this.center = { x: size / 2, y: size / 2 };
+    this.scale = size / OVERALL_DART_BOARD_DIAMETER;
   }
 
   // drawDart draws a dart marker.
   private drawDart(point: Point) {
     this.ctx.beginPath();
     this.ctx.moveTo(point.x, point.y);
-    this.ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
+    this.ctx.arc(point.x, point.y, 3 * this.scale, 0, Math.PI * 2);
     this.ctx.fillStyle = "orange";
     this.ctx.fill();
 
@@ -91,13 +94,13 @@ export class Dartboard {
       this.ctx.arc(
         this.center.x,
         this.center.y,
-        length,
+        length * this.scale,
         angle,
         angle + (Math.PI * 2) / SEGMENTS
       );
       this.ctx.lineTo(this.center.x, this.center.y);
       this.ctx.fillStyle = fillStyle(i);
-      this.ctx.lineWidth = WIRE_WIDTH;
+      this.ctx.lineWidth = WIRE_WIDTH * this.scale;
       this.ctx.strokeStyle = WIRE_COLOR;
       this.ctx.fill();
       this.ctx.stroke();
@@ -106,9 +109,9 @@ export class Dartboard {
 
   private drawCircle(center: Point, radius: number, fillStyle: string) {
     this.ctx.beginPath();
-    this.ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+    this.ctx.arc(center.x, center.y, radius * this.scale, 0, Math.PI * 2);
     this.ctx.fillStyle = fillStyle;
-    this.ctx.lineWidth = WIRE_WIDTH;
+    this.ctx.lineWidth = WIRE_WIDTH * this.scale;
     this.ctx.strokeStyle = WIRE_COLOR;
     this.ctx.fill();
     this.ctx.stroke();
@@ -127,15 +130,18 @@ export class Dartboard {
       const angle = ((Math.PI * 2) / SEGMENTS) * i;
       const text = SEGMENT_MAPPINGS[(i + 5) % SEGMENTS].toString();
 
-      this.ctx.font = "20px Arial";
+      this.ctx.font = `${20 * this.scale}px Arial`;
       this.ctx.fillStyle = "white";
       this.ctx.textAlign = "center";
       this.ctx.textBaseline = "middle";
       this.ctx.fillText(
         text,
         this.center.x +
-          Math.cos(angle) * (OVERALL_DART_BOARD_DIAMETER / 2 - 20),
-        this.center.y + Math.sin(angle) * (OVERALL_DART_BOARD_DIAMETER / 2 - 20)
+          Math.cos(angle) *
+            ((OVERALL_DART_BOARD_DIAMETER / 2 - 20) * this.scale),
+        this.center.y +
+          Math.sin(angle) *
+            ((OVERALL_DART_BOARD_DIAMETER / 2 - 20) * this.scale)
       );
     }
 
@@ -200,15 +206,15 @@ export class Dartboard {
         Math.pow(point.y - this.center.y, 2)
     );
 
-    if (distance <= INNER_BULL_INSIDE_DIAMETER / 2) {
+    if (distance <= (INNER_BULL_INSIDE_DIAMETER / 2) * this.scale) {
       return "b50";
     }
 
-    if (distance <= OUTER_BULL_INSIDE_DIAMETER / 2) {
+    if (distance <= (OUTER_BULL_INSIDE_DIAMETER / 2) * this.scale) {
       return "b25";
     }
 
-    if (distance > OVERALL_DART_BOARD_DIAMETER / 2) {
+    if (distance > (OVERALL_DART_BOARD_DIAMETER / 2) * this.scale) {
       return "f";
     }
 
@@ -234,13 +240,14 @@ export class Dartboard {
     const segmentScore = SEGMENT_MAPPINGS[(segment + SEGMENTS + 5) % SEGMENTS];
 
     const multiplier =
-      distance <= TREBLE_WIRE_TO_CENTER_BULL &&
-      distance > TREBLE_WIRE_TO_CENTER_BULL - DOUBLE_TREBLE_WIDTH
+      distance <= TREBLE_WIRE_TO_CENTER_BULL * this.scale &&
+      distance > (TREBLE_WIRE_TO_CENTER_BULL - DOUBLE_TREBLE_WIDTH) * this.scale
         ? "t"
-        : distance <= DOUBLE_WIRE_TO_CENTER_BULL &&
-          distance > DOUBLE_WIRE_TO_CENTER_BULL - DOUBLE_TREBLE_WIDTH
+        : distance <= DOUBLE_WIRE_TO_CENTER_BULL * this.scale &&
+          distance >
+            (DOUBLE_WIRE_TO_CENTER_BULL - DOUBLE_TREBLE_WIDTH) * this.scale
         ? "d"
-        : distance >= DOUBLE_WIRE_TO_CENTER_BULL
+        : distance >= DOUBLE_WIRE_TO_CENTER_BULL * this.scale
         ? "o"
         : "";
 

@@ -79,5 +79,9 @@ export function Parse(score: string): Throw | null {
     return { kind, segment, multiplier };
   }
 
-  return { kind: ThrowKind.Floor, segment: -1, multiplier: 0 };
+  return {
+    kind: ThrowKind.Floor,
+    segment: -1,
+    multiplier: 0,
+  };
 }
