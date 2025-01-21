@@ -10,6 +10,7 @@ export enum Game {
 export class Classic301 {
   private board: Dartboard;
   private canvas: HTMLCanvasElement;
+  private content: HTMLDivElement;
   private game: HTMLDivElement;
   private table: HTMLTableElement;
   private players: number = 1;
@@ -28,9 +29,14 @@ export class Classic301 {
       throw new Error("Failed to get dartboard canvas.");
     }
 
+    this.content = document.getElementById("content") as HTMLDivElement;
+    if (this.content === null) {
+      throw new Error("Failed to get content element.");
+    }
+
     this.board = new Dartboard(
       this.canvas,
-      Math.min(window.innerWidth, window.innerHeight)
+      Math.min(this.content.offsetWidth, this.content.offsetHeight)
     );
     this.players = players;
 
@@ -46,6 +52,7 @@ export class Classic301 {
       records.pop();
       localStorage.setItem("records", JSON.stringify(records));
 
+      this.board.reset();
       this.board.draw(this.darts);
       this.updateTable();
     });
@@ -110,8 +117,11 @@ export class Classic301 {
         throw: thro,
       };
 
-      addEventListener("resize", () => {
-        const size: number = Math.min(window.innerWidth, window.innerHeight);
+      window.visualViewport.addEventListener("resize", () => {
+        const size: number = Math.min(
+          this.content.offsetWidth,
+          this.content.offsetHeight
+        );
 
         this.darts = this.darts.map((record) => {
           record.canvas.width = size;
@@ -125,6 +135,7 @@ export class Classic301 {
         });
 
         this.board.resize(size);
+        this.draw();
       });
 
       const records = localStorage.getJSON("records") || [];
@@ -139,6 +150,7 @@ export class Classic301 {
   }
 
   draw() {
+    this.board.reset();
     this.board.draw(this.darts);
   }
 

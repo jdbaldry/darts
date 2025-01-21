@@ -51,6 +51,7 @@ export class Dartboard {
 
     this.ctx.canvas.width = size;
     this.ctx.canvas.height = size;
+
     this.center = { x: canvas.width / 2, y: canvas.height / 2 };
     this.scale = size / OVERALL_DART_BOARD_DIAMETER;
 

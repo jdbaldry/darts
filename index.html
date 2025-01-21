@@ -1,23 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./style.css" />
   <title>Darts</title>
 </head>
+
 <body>
-  <div id="menu">
+  <nav>
     <h1>Darts</h1>
+  </nav>
+  <aside id="menu">
     <div id="app">
       <button id="export">Export</button>
       <button id="load">Load</button>
       <button id="clear">Clear local storage</button>
     </div>
     <div id="game"></div>
-    </div>
-  </div>
-  <canvas id="dartboard"></canvas>
+  </aside>
+  <main id="content">
+    <canvas id="dartboard"></canvas>
+  </main>
   <script src="./dist/bundle.js"></script>
 </body>
+
 </html>
