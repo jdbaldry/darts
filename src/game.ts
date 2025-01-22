@@ -62,7 +62,11 @@ export class Classic301 {
     reset.textContent = "Reset";
     reset.addEventListener("click", (event) => {
       this.board.reset();
-      this.table.innerHTML = "";
+
+      if (this.table.tBodies.length > 0) {
+        this.table.removeChild(this.table.tBodies[0]);
+      }
+
       this.out = false;
       this.darts = [];
 
@@ -115,6 +119,8 @@ export class Classic301 {
         game: Game.Classic301,
         player: "jdb",
         throw: thro,
+
+        context: {},
       };
 
       window.visualViewport.addEventListener("resize", () => {
@@ -162,7 +168,7 @@ export class Classic301 {
 
     let body: HTMLTableSectionElement = document.createElement("tbody");
     let row: HTMLTableRowElement;
-    for (const dart of this.darts) {
+    this.darts.map((dart) => {
       if (thro === 0) {
         startOfTurn = remaining;
 
@@ -177,6 +183,10 @@ export class Classic301 {
         row.insertCell();
       }
 
+      if (this.wasForDouble(remaining)) {
+        dart.context.forDouble = true;
+      }
+
       const remainingCell = row.cells[1];
       const throwCell = row.cells[2 + thro];
 
@@ -189,7 +199,7 @@ export class Classic301 {
           turn++;
         }
 
-        continue;
+        return dart;
       }
 
       remaining -= dart.throw.segment * dart.throw.multiplier;
@@ -198,7 +208,7 @@ export class Classic301 {
         throwCell.textContent = `${dart.throw.kind}${dart.throw.segment} (OUT)`;
         this.out = true;
 
-        continue;
+        return dart;
       }
 
       if (remaining < 2) {
@@ -210,7 +220,7 @@ export class Classic301 {
         thro = 0;
         turn++;
 
-        continue;
+        return dart;
       }
 
       throwCell.textContent = `${dart.throw.kind}${dart.throw.segment}`;
@@ -221,7 +231,7 @@ export class Classic301 {
         thro = 0;
         turn++;
       }
-    }
+    });
 
     // Replace this table's body with the new body.
     if (this.table.tBodies.length === 0) {
@@ -229,5 +239,9 @@ export class Classic301 {
     } else {
       this.table.replaceChild(body, this.table.tBodies[0]);
     }
+  }
+
+  private wasForDouble(remaining: number): boolean {
+    return remaining === 50 || (remaining <= 40 && remaining % 2 === 0);
   }
 }
