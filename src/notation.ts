@@ -14,6 +14,8 @@ export type ThrowRecord = {
   game: Game;
   player: string;
   throw: Throw;
+
+  context: { [key: string]: any };
 };
 
 export type Throw = {

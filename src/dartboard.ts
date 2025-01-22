@@ -69,11 +69,11 @@ export class Dartboard {
   }
 
   // drawDart draws a dart marker.
-  private drawDart(point: Point) {
+  private drawDart(point: Point, color: string = "orange") {
     this.ctx.beginPath();
     this.ctx.moveTo(point.x, point.y);
     this.ctx.arc(point.x, point.y, 3 * this.scale, 0, Math.PI * 2);
-    this.ctx.fillStyle = "orange";
+    this.ctx.fillStyle = color;
     this.ctx.fill();
 
     // Draw lines extending from the center of the point to the edge of the canvas for debugging.
@@ -178,7 +178,10 @@ export class Dartboard {
     if (this.debug) this.drawGridLines();
 
     for (const dart of darts) {
-      this.drawDart(dart.point);
+      this.drawDart(
+        dart.point,
+        dart.context?.forDouble ? "#b880ff" : "#FFA500"
+      );
     }
   }
 
@@ -234,7 +237,7 @@ export class Dartboard {
         this.center.x + (Math.cos(angle) * OVERALL_DART_BOARD_DIAMETER) / 2,
         this.center.y + (Math.sin(angle) * OVERALL_DART_BOARD_DIAMETER) / 2
       );
-      this.ctx.strokeStyle = "orange";
+      this.ctx.strokeStyle = "#FFA500";
       this.ctx.stroke();
     }
 
